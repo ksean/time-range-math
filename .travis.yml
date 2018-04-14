@@ -18,6 +18,7 @@ before_script:
   - go get github.com/golang/lint/golint                        # Linter
   - go get honnef.co/go/tools/cmd/megacheck                     # Static analyzer/linter
   - go get github.com/fzipp/gocyclo
+  - go get github.com/ksean/time-range-math/time-range
 
 script:
   - test -z $(gofmt -s -l $GO_FILES)           # Fail if a .go file hasn't been formatted with gofmt
