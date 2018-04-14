@@ -7,9 +7,18 @@ import (
 	. "github.com/ksean/time-range-math/time-range/type"
 	"strings"
 	"strconv"
+	. "github.com/ksean/time-range-math/time-range/impl"
+	"os"
 )
 
 var testDate = Unix(0, 0)
+var implementations = []AlgebraOfSets{}
+
+func TestMain(m *testing.M) {
+	implementations = append(implementations, SimpleAlgebraOfSets{})
+	retCode := m.Run()
+	os.Exit(retCode)
+}
 
 // Test given examples
 func TestMinusPartialIntersection(t *testing.T) {
@@ -17,11 +26,9 @@ func TestMinusPartialIntersection(t *testing.T) {
 	minuendRanges := []Timerange{getTimerangeFromString("9:00-10:00")}
 	subtrahendRanges := []Timerange{getTimerangeFromString("9:00-9:30")}
 
-	actualResult := SubtractTimeranges(minuendRanges, subtrahendRanges)
-
 	expectedResult := []Timerange{getTimerangeFromString("9:30-10:00")}
 
-	assertEqual(t, expectedResult, actualResult)
+	testAll(t, expectedResult, minuendRanges, subtrahendRanges)
 }
 
 func TestMinusSameRange(t *testing.T) {
@@ -29,11 +36,9 @@ func TestMinusSameRange(t *testing.T) {
 	minuendRanges := []Timerange{getTimerangeFromString("9:00-10:00")}
 	subtrahendRanges := []Timerange{getTimerangeFromString("9:00-10:00")}
 
-	actualResult := SubtractTimeranges(minuendRanges, subtrahendRanges)
-
 	var expectedResult []Timerange
 
-	assertEqual(t, expectedResult, actualResult)
+	testAll(t, expectedResult, minuendRanges, subtrahendRanges)
 }
 
 func TestMinusNonIntersectingRange(t *testing.T) {
@@ -41,11 +46,9 @@ func TestMinusNonIntersectingRange(t *testing.T) {
 	minuendRanges := []Timerange{getTimerangeFromString("9:00-9:30")}
 	subtrahendRanges := []Timerange{getTimerangeFromString("9:30-15:00")}
 
-	actualResult := SubtractTimeranges(minuendRanges, subtrahendRanges)
-
 	expectedResult := []Timerange{getTimerangeFromString("9:00-9:30")}
 
-	assertEqual(t, expectedResult, actualResult)
+	testAll(t, expectedResult, minuendRanges, subtrahendRanges)
 }
 
 func TestManyRangesMinusOneRange(t *testing.T) {
@@ -57,14 +60,12 @@ func TestManyRangesMinusOneRange(t *testing.T) {
 
 	subtrahendRanges := []Timerange{getTimerangeFromString("9:15-10:15")}
 
-	actualResult := SubtractTimeranges(minuendRanges, subtrahendRanges)
-
 	expectedResult := []Timerange{
 		getTimerangeFromString("9:00-9:15"),
 		getTimerangeFromString("10:15-10:30"),
 	}
 
-	assertEqual(t, expectedResult, actualResult)
+	testAll(t, expectedResult, minuendRanges, subtrahendRanges)
 }
 
 func TestManyRangesMinusManyRanges(t *testing.T) {
@@ -81,17 +82,24 @@ func TestManyRangesMinusManyRanges(t *testing.T) {
 		getTimerangeFromString("12:30-16:00"),
 	}
 
-	actualResult := SubtractTimeranges(minuendRanges, subtrahendRanges)
-
 	expectedResult := []Timerange{
 		getTimerangeFromString("9:15-10:00"),
 		getTimerangeFromString("10:15-11:00"),
 	}
 
-	assertEqual(t, expectedResult, actualResult)
+	testAll(t, expectedResult, minuendRanges, subtrahendRanges)
 }
 
 // Test specific helpers ****************************************************************************
+
+func testAll(t *testing.T, expected []Timerange, minuend []Timerange, subtrahend []Timerange) {
+
+	for _, implementation := range implementations {
+		actual := implementation.Subtract(minuend, subtrahend)
+
+		assertEqual(t, expected, actual)
+	}
+}
 
 func assertEqual(t *testing.T, expected []Timerange, actual []Timerange) {
 

@@ -1,38 +1,32 @@
-package time_range
+package impl
+
 import . "time"
 import . "github.com/ksean/time-range-math/time-range/type"
 
+type SimpleAlgebraOfSets struct {}
 
-func SubtractTimeranges(minuend []Timerange, subtrahend []Timerange) []Timerange {
-	var result []Timerange
-
-	result = simpleSubtractManyFromManyTimeranges(minuend, subtrahend)
-
-	return result
-}
-
-func simpleSubtractManyFromManyTimeranges(minuend []Timerange, subtrahend []Timerange) []Timerange {
+func (s SimpleAlgebraOfSets) Subtract(minuend []Timerange, subtrahend []Timerange) []Timerange {
 	var result = minuend
 
 	for _, timerange := range subtrahend {
-		result = simpleSubtractOneFromManyTimeranges(result, timerange)
+		result = subtractOneFromMany(result, timerange)
 	}
 
 	return result
 }
 
-func simpleSubtractOneFromManyTimeranges(minuend []Timerange, subtrahend Timerange) []Timerange {
+func subtractOneFromMany(minuend []Timerange, subtrahend Timerange) []Timerange {
 	var result []Timerange
 
 	for _, timerange := range minuend {
-		trimmed := simpleSubtractOneFromOneTimerange(timerange, subtrahend)
+		trimmed := subtractOneFromOne(timerange, subtrahend)
 		result = append(result, trimmed...)
 	}
 
 	return result
 }
 
-func simpleSubtractOneFromOneTimerange(minuend Timerange, subtrahend Timerange) []Timerange {
+func subtractOneFromOne(minuend Timerange, subtrahend Timerange) []Timerange {
 	var result []Timerange
 
 	subtrahendStartInRange := isTimeInRange(minuend, subtrahend.Start)
@@ -55,37 +49,37 @@ func simpleSubtractOneFromOneTimerange(minuend Timerange, subtrahend Timerange) 
 
 		return result
 
-	/*
-	Case 2:
-	A intersection with B is a null set (no intersection)
-	A ∩ B = ∅
-	 */
+		/*
+		Case 2:
+		A intersection with B is a null set (no intersection)
+		A ∩ B = ∅
+		 */
 	} else if !subtrahendStartInRange && !subtrahendEndInRange {
 		result = append(result, minuend)
 
-	/*
-	Case 3:
-	A has a partial intersection with B at the end of its range
-	A ∩ B != ∅
-	 */
+		/*
+		Case 3:
+		A has a partial intersection with B at the end of its range
+		A ∩ B != ∅
+		 */
 	} else if subtrahendStartInRange && !subtrahendEndInRange {
 		minuend.End = subtrahend.Start
 		result = append(result, minuend)
 
-	/*
-	Case 4:
-	A has a partial intersection with B at the start of its range
-	A ∩ B != ∅
-	 */
+		/*
+		Case 4:
+		A has a partial intersection with B at the start of its range
+		A ∩ B != ∅
+		 */
 	} else if !subtrahendStartInRange && subtrahendEndInRange {
 		minuend.Start = subtrahend.End
 		result = append(result, minuend)
 
-	/*
-	Case 5:
-	A is a superset of B, but B != A
-	A ⊃ B
-	 */
+		/*
+		Case 5:
+		A is a superset of B, but B != A
+		A ⊃ B
+		 */
 	} else {
 		var firstBisection Timerange
 		var secondBisection Timerange
@@ -103,6 +97,9 @@ func simpleSubtractOneFromOneTimerange(minuend Timerange, subtrahend Timerange) 
 	return result
 }
 
+// The check to see if a time is "in" a range
+
 func isTimeInRange(timerange Timerange, time Time) bool {
+
 	return timerange.Start.Before(time) && timerange.End.After(time)
 }
