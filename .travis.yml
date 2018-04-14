@@ -1,5 +1,5 @@
 language: go
-  - 1.9
+  - 1.10
   - master
 
 install: true
@@ -18,7 +18,7 @@ before_script:
   - go get github.com/golang/lint/golint                        # Linter
   - go get honnef.co/go/tools/cmd/megacheck                     # Static analyzer/linter
   - go get github.com/fzipp/gocyclo
-  - go get github.com/ksean/time-range-math/time-range/...
+  - go get ./...
 
 script:
   - go test -v -race ./...                     # Run all the tests with the race detector enabled
