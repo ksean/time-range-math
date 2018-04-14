@@ -76,7 +76,7 @@ func simpleSubtractOneFromOneTimerange(minuend Timerange, subtrahend Timerange) 
 		firstBisection.end = subtrahend.start
 
 		secondBisection.start = subtrahend.end
-		secondBisection.end = minuend.start
+		secondBisection.end = minuend.end
 
 		result = append(result, firstBisection)
 		result = append(result, secondBisection)
