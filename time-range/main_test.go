@@ -15,7 +15,7 @@ var testDate = Unix(0, 0)
 var implementations = []AlgebraOfSets{}
 
 func TestMain(m *testing.M) {
-	implementations = append(implementations, SimpleAlgebraOfSets{})
+	implementations = append(implementations, SimpleAlgebraOfSets{}, SortedAlgebraOfSets{})
 	retCode := m.Run()
 	os.Exit(retCode)
 }
@@ -78,7 +78,6 @@ func TestManyRangesMinusManyRanges(t *testing.T) {
 	subtrahendRanges := []Timerange{
 		getTimerangeFromString("9:00-9:15"),
 		getTimerangeFromString("10:00-10:15"),
-		getTimerangeFromString("10:15-12:30"),
 		getTimerangeFromString("12:30-16:00"),
 	}
 
